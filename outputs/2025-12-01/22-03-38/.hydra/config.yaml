@@ -1,0 +1,18 @@
+task_name: debug
+callbacks: null
+logger: null
+extras:
+  ignore_warnings: false
+  enforce_tags: false
+trainer:
+  max_epochs: 3
+  accelerator: cpu
+  devices: 1
+  detect_anomaly: true
+  limit_train_batches: 0.01
+  limit_val_batches: 0.05
+  limit_test_batches: 0.05
+datamodule:
+  dataloader:
+    num_workers: 0
+    pin_memory: false
