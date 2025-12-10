@@ -374,4 +374,4 @@ python src/train.py experiment=semantic/s3dis datamodule.fold=5 datamodule.batch
 
 # Option 2: Use PyTorch's memory management
 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True python src/train.py experiment=semantic/s3dis datamodule.fold=5
-PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True python src/train.py experiment=semantic/s3dis datamodule.fold=5
+PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True python src/train.py experiment=semantic/s3dis datamodule.fold=5 trainer.max_epochs=2000

@@ -7,7 +7,7 @@ defaults:
   - datamodule: semantic/s3dis.yaml
   - model: semantic/spt-2.yaml
   - callbacks: default.yaml
-  - logger: wandb.yaml # null for default, set logger here or use command line (e.g. `python train.py logger=tensorboard`)
+  - logger: tensorboard.yaml # null for default, set logger here or use command line (e.g. `python train.py logger=tensorboard`)
   - trainer: default.yaml
   - paths: default.yaml
   - extras: default.yaml
@@ -45,7 +45,8 @@ train: True
 
 # evaluate on test set, using best model weights achieved during training
 # lightning chooses best weights based on the metric specified in checkpoint callback
-test: True
+# Disabled by default due to PyTorch 2.10 checkpoint loading compatibility issues
+test: False
 
 # compile model for faster training with pytorch >=2.1.0
 compile: False

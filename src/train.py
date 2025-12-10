@@ -46,7 +46,39 @@ from omegaconf import OmegaConf, DictConfig
 from pytorch_lightning import Callback, LightningDataModule, LightningModule, Trainer
 from pytorch_lightning.loggers import Logger
 
+# Fix for PyTorch 2.10 checkpoint loading compatibility
+# PyTorch 2.10 changed default weights_only=True which breaks PyTorch Lightning checkpoints
+# Import project classes first, then add to safe globals
 from src import utils
+import collections
+
+if hasattr(torch.serialization, 'add_safe_globals'):
+    # Import the LR scheduler class that's saved in checkpoints
+    from src.optim.lr_scheduler import CosineAnnealingLRWithWarmup
+    
+    # Add all classes that might be in checkpoints to safe globals
+    # This includes Python built-ins, PyTorch classes, and project-specific classes
+    torch.serialization.add_safe_globals([
+        getattr,
+        collections.defaultdict,
+        collections.OrderedDict,
+        CosineAnnealingLRWithWarmup,
+        torch.optim.lr_scheduler.CosineAnnealingLR,
+        torch.optim.lr_scheduler.LambdaLR,
+        torch.optim.lr_scheduler.StepLR,
+        torch.optim.lr_scheduler.MultiStepLR,
+        torch.optim.Adam,
+        torch.optim.AdamW,
+    ])
+
+# Monkey patch PyTorch Lightning to use weights_only=False for checkpoints
+# This is safe since we trust our own checkpoints
+import lightning_fabric.utilities.cloud_io as cloud_io
+_original_load = cloud_io._load
+def _patched_load(path, map_location=None, weights_only=None):
+    # Force weights_only=False for our trusted checkpoints
+    return _original_load(path, map_location=map_location, weights_only=False)
+cloud_io._load = _patched_load
 
 # Registering the "eval" resolver allows for advanced config
 # interpolation with arithmetic operations:
